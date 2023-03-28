@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 
 public class CSVDataRecorder : CSVUtilities
 {
@@ -91,7 +92,7 @@ public class CSVDataRecorder : CSVUtilities
         m_constDataList.Add(m_characterScale);
 
         m_recordingDelay.Add("Recording_Delay");
-        m_recordingDelay.Add(recordingDelay.ToString());
+        m_recordingDelay.Add(recordingDelay.ToString(CultureInfo.InvariantCulture));
         m_constDataList.Add(m_recordingDelay);
 
         m_time.Add("Time");
@@ -111,7 +112,7 @@ public class CSVDataRecorder : CSVUtilities
     {
         float time = Time.realtimeSinceStartup;
         time = Mathf.Round(time * 100f) / 100f;
-        m_time.Add(time.ToString());
+        m_time.Add(time.ToString(CultureInfo.InvariantCulture));
 
         m_characterRootPositions.Add((character.transform.position - m_characterInitialPosition).ToString("N3"));
         m_characterRootRotations.Add(character.transform.eulerAngles.ToString());

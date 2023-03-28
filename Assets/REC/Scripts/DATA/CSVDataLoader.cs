@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 
 public class CSVDataLoader : CSVUtilities
 {
@@ -111,7 +112,7 @@ public class CSVDataLoader : CSVUtilities
            DataInitializer("Root_Bone_Local_Position", out m_rootBoneLocalPositions))
         {
             character.transform.localScale = StringToVector3(m_characterScale[1]);
-            m_replayingDelay = float.Parse(m_recordingDelay[1]);
+            m_replayingDelay = float.Parse(m_recordingDelay[1], CultureInfo.InvariantCulture);
 
             for (int i = 0; i < m_inputData.Length; i++)
                 GetRotationDataForMatchingBoneInChildren(character.transform, m_inputData[i][0], i);
