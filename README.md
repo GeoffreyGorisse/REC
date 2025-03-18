@@ -50,4 +50,4 @@ The tool matches recorded bone names using the tagging system, enabling real-tim
 
 ## License
 
-This project is licensed under the **GNU LGPLv3**.  
+This project is licensed under the **GNU GPLv3**.  
