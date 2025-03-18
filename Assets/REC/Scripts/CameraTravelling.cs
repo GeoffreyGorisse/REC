@@ -1,14 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CameraTravelling : MonoBehaviour
 {
-    public float rotationAngle = 5.0f;
-    public float speed = 1.0f;
+    [SerializeField] private float _rotationAngle = 20f;
+    [SerializeField] private float _speed = 0.2f;
 
     void Update()
     {
-        transform.rotation = Quaternion.Euler(0.0f, Mathf.Sin(Time.time * speed) * rotationAngle, 0.0f);
+        transform.rotation = Quaternion.Euler(0.0f, Mathf.Sin(Time.time * _speed) * _rotationAngle, 0.0f);
     }
 }

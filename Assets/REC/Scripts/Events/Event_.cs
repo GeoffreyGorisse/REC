@@ -1,11 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 abstract public class Event_ : MonoBehaviour {
 
-    protected bool p_eventConfigurated = false;
-    protected float p_eventDuration;
+    protected bool EventConfigurated = false;
+    protected float EventDuration = 0f;
 
     void OnEnable()
     {
@@ -19,7 +17,7 @@ abstract public class Event_ : MonoBehaviour {
 
     virtual protected void Update()
     {
-        p_eventDuration += Time.deltaTime;
+        EventDuration += Time.deltaTime;
     }
 
     abstract protected void EventInitialisation();

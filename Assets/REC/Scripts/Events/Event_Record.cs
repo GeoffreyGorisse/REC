@@ -1,51 +1,49 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Event_Record : Event_
 {
-    private bool m_eventConfigurated = false;
+    [SerializeField] private Animator _agentAnimator;
+    [SerializeField] private bool _recordMotion = true;
 
-    public Animator agentAnimator;
-    public bool recordMotion = true;
-
-    private AnimatorClipInfo[] m_clipInfos;
-    private bool m_animationEnd = false;
+    private bool _eventConfigurated = false;
+    private AnimatorClipInfo[] _clipInfos;
+    private bool _animationEnd = false;
 
     override protected void Update()
     {
         base.Update();
 
-        if (m_eventConfigurated)
+        if (_eventConfigurated)
             EventUpdate();
     }
 
     override protected void EventInitialisation()
     {
-        if(agentAnimator)
+        if(_agentAnimator)
         {
-            agentAnimator.enabled = true;
+            _agentAnimator.enabled = true;
             StartCoroutine(WaitForAnimationEnd());
         }
 
-        m_eventConfigurated = true;
+        _eventConfigurated = true;
     }
 
     override protected void EventReinitialisation()
     {
-        if (agentAnimator)
-            agentAnimator.enabled = false;
+        if (_agentAnimator)
+            _agentAnimator.enabled = false;
     }
 
     private void EventUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.Space) || m_animationEnd)
+        if (Input.GetKeyDown(KeyCode.Space) || _animationEnd)
             EventEnd();
     }
 
     override public void EventEnd()
     {
-        if(recordMotion)
+        if(_recordMotion)
             CSVDataRecorder.Instance.DATACollection();
 
         base.EventEnd();
@@ -53,11 +51,11 @@ public class Event_Record : Event_
 
     private IEnumerator WaitForAnimationEnd()
     {
-        m_clipInfos = agentAnimator.GetCurrentAnimatorClipInfo(0);
-        Debug.Log("Animation name: " + m_clipInfos[0].clip.name + "; Duration: " + m_clipInfos[0].clip.length.ToString() + "; Speed: " + agentAnimator.GetFloat("Speed"));
+        _clipInfos = _agentAnimator.GetCurrentAnimatorClipInfo(0);
+        Debug.Log("Animation name: " + _clipInfos[0].clip.name + "; Duration: " + _clipInfos[0].clip.length.ToString() + "; Speed: " + _agentAnimator.GetFloat("Speed"));
 
-        yield return new WaitForSeconds(m_clipInfos[0].clip.length / agentAnimator.GetFloat("Speed"));
+        yield return new WaitForSeconds(_clipInfos[0].clip.length / _agentAnimator.GetFloat("Speed"));
 
-        m_animationEnd = true;
+        _animationEnd = true;
     }
 }

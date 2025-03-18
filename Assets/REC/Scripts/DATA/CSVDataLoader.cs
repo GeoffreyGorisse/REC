@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -7,31 +6,28 @@ public class CSVDataLoader : CSVUtilities
 {
     public static CSVDataLoader Instance { get; private set; }
 
-    public string CSVFileNameToLoad = "MotionDATA";
-    public GameObject character;
-    public Transform rootBone;
-    public Event_Replay event_Replay;
+    [SerializeField] private string _CSVFileNameToLoad = "MotionDATA";
+    [SerializeField] private GameObject _character;
+    [SerializeField] private Transform _rootBone;
+    [SerializeField] private Event_Replay _event_Replay;
 
-    private string m_directoryPath;
-    private string m_fileName;
-    private string[][] m_inputData;
-    private bool m_dataRead = false;
-    private bool m_characterDataInitialized = false;
-    private bool m_initialization = false;
-    private Vector3 m_characterInitialPosition;
-    private float m_lastReplayingTime;
-    private int m_replayingIndex = 0;
-    private float m_replayingDelay;
+    private string _directoryPath;
+    private string[][] _inputData;
+    private bool _dataRead = false;
+    private bool _characterDataInitialized = false;
+    private bool _initialization = false;
+    private Vector3 _characterInitialPosition;
+    private float _lastReplayingTime;
+    private int _replayingIndex = 0;
+    private float _replayingDelay;
 
-    private List<Transform> m_bones = new List<Transform>();
-    private List<string> m_characterScale = new List<string>();
-    private List<string> m_recordingDelay = new List<string>();
-    private List<string> m_characterRootPositions = new List<string>();
-    private List<string> m_characterRootRotations = new List<string>();
-    private List<string> m_rootBoneLocalPositions = new List<string>();
-    private List<List<string>> m_bonesLocalRotations = new List<List<string>>();
-
-
+    private List<Transform> _bones = new List<Transform>();
+    private List<string> _characterScale = new List<string>();
+    private List<string> _recordingDelay = new List<string>();
+    private List<string> _characterRootPositions = new List<string>();
+    private List<string> _characterRootRotations = new List<string>();
+    private List<string> _rootBoneLocalPositions = new List<string>();
+    private List<List<string>> _bonesLocalRotations = new List<List<string>>();
 
     void Awake()
     {
@@ -40,27 +36,27 @@ public class CSVDataLoader : CSVUtilities
 
         else
         {
-            Debug.LogWarning("A singleton cannot be instanciated twice");
+            Debug.LogWarning("A singleton cannot be instanciated twice!");
             Destroy(this.gameObject);
         }
     }
 
     void Update()
     {
-        if (event_Replay.isActiveAndEnabled)
+        if (_event_Replay.isActiveAndEnabled)
         {
-            if(character && rootBone)
+            if(_character && _rootBone)
             {
-                if (!m_initialization)
+                if (!_initialization)
                 {
-                    m_lastReplayingTime = Time.time;
-                    m_characterInitialPosition = character.transform.position;
+                    _lastReplayingTime = Time.time;
+                    _characterInitialPosition = _character.transform.position;
 
                     ReadCSVData();
                     InitializeCharacterData();
 
-                    if (m_dataRead && m_characterDataInitialized)
-                        m_initialization = true;
+                    if (_dataRead && _characterDataInitialized)
+                        _initialization = true;
 
                     else
                     {
@@ -69,13 +65,13 @@ public class CSVDataLoader : CSVUtilities
                     }
                 }
 
-                else if (m_initialization && m_replayingIndex < m_bonesLocalRotations[0].Count - 1 && Time.time >= m_lastReplayingTime + m_replayingDelay)
+                else if (_initialization && _replayingIndex < _bonesLocalRotations[0].Count - 1 && Time.time >= _lastReplayingTime + _replayingDelay)
                 {
-                    m_replayingIndex++;
-                    ReplayMotion(m_replayingIndex);
-                    m_lastReplayingTime = Time.time;
+                    _replayingIndex++;
+                    ReplayMotion(_replayingIndex);
+                    _lastReplayingTime = Time.time;
 
-                    if (m_replayingIndex == m_bonesLocalRotations[0].Count - 1)
+                    if (_replayingIndex == _bonesLocalRotations[0].Count - 1)
                         Debug.Log("Motion replaying end.");
                 }
             }
@@ -87,13 +83,12 @@ public class CSVDataLoader : CSVUtilities
 
     private void ReadCSVData()
     {
-        m_directoryPath = Application.dataPath + @"/StreamingAssets/DATA/";
-        m_fileName = CSVFileNameToLoad + ".csv";
+        _directoryPath = Application.dataPath + @"/StreamingAssets/DATA/";
 
         try
         {
-            m_inputData = ReadCSV(m_directoryPath, m_fileName);
-            m_dataRead = true;
+            _inputData = ReadCSV(_directoryPath, _CSVFileNameToLoad + ".csv");
+            _dataRead = true;
         }
 
         catch (System.Exception)
@@ -105,46 +100,46 @@ public class CSVDataLoader : CSVUtilities
     private void InitializeCharacterData()
     {
 
-        if(DataInitializer("Character_Scale", out m_characterScale) &&
-           DataInitializer("Recording_Delay", out m_recordingDelay) &&
-           DataInitializer("Character_Root_Position", out m_characterRootPositions) &&
-           DataInitializer("Character_Root_Rotation", out m_characterRootRotations) &&
-           DataInitializer("Root_Bone_Local_Position", out m_rootBoneLocalPositions))
+        if(LoadData("Character_Scale", out _characterScale) &&
+           LoadData("Recording_Delay", out _recordingDelay) &&
+           LoadData("Character_Root_Position", out _characterRootPositions) &&
+           LoadData("Character_Root_Rotation", out _characterRootRotations) &&
+           LoadData("Root_Bone_Local_Position", out _rootBoneLocalPositions))
         {
-            character.transform.localScale = StringToVector3(m_characterScale[1]);
-            m_replayingDelay = float.Parse(m_recordingDelay[1], CultureInfo.InvariantCulture);
+            _character.transform.localScale = StringToVector3(_characterScale[1]);
+            _replayingDelay = float.Parse(_recordingDelay[1], CultureInfo.InvariantCulture);
 
-            for (int i = 0; i < m_inputData.Length; i++)
-                GetRotationDataForMatchingBoneInChildren(character.transform, m_inputData[i][0], i);
+            for (int i = 0; i < _inputData.Length; i++)
+                GetBonesRotationData(_character.transform, _inputData[i][0], i);
 
-            m_characterDataInitialized = true;
+            _characterDataInitialized = true;
         }
 
         else
         {
-            m_characterDataInitialized = false;
+            _characterDataInitialized = false;
             Debug.LogError("Character data initialization has failed!");
         }
     }
 
-      private bool DataInitializer(string inputDataName, out List<string> dataListToBeInitialized)
+    private bool LoadData(string inputDataName, out List<string> dataListToBeInitialized)
     {
         dataListToBeInitialized = new List<string>();
 
-        for (int i = 0; i < m_inputData.Length; i++)
+        for (int i = 0; i < _inputData.Length; i++)
         {
-            if (m_inputData[i][0] == inputDataName)
+            if (_inputData[i][0] == inputDataName)
             {
-                for (int j = 0; j < m_inputData[i].Length; j++)
+                for (int j = 0; j < _inputData[i].Length; j++)
                 {
-                    if (string.IsNullOrEmpty(m_inputData[i][j]))
+                    if (string.IsNullOrEmpty(_inputData[i][j]))
                     {
                         Debug.LogError(inputDataName + " incorrect or missing data!");
                         return false;
                     }
                 }
 
-                dataListToBeInitialized.AddRange(m_inputData[i]);
+                dataListToBeInitialized.AddRange(_inputData[i]);
                 return true;
             }
         }
@@ -153,31 +148,31 @@ public class CSVDataLoader : CSVUtilities
         return false;
     }
 
-    private void GetRotationDataForMatchingBoneInChildren(Transform root, string boneName, int currentIterator)
+    private void GetBonesRotationData(Transform root, string boneName, int currentIterator)
     {
         if (root.name == boneName)
         {
-            m_bones.Add(root);
+            _bones.Add(root);
 
             List<string> boneRotations = new List<string>();
 
-            for (int j = 0; j < m_inputData[currentIterator].Length; j++)
+            for (int j = 0; j < _inputData[currentIterator].Length; j++)
             {
-                if (string.IsNullOrEmpty(m_inputData[currentIterator][j]))
+                if (string.IsNullOrEmpty(_inputData[currentIterator][j]))
                 {
                     Debug.LogError(boneName + "local rotation incorrect or missing data!");
                     return;
                 }
             }
             
-            boneRotations.AddRange(m_inputData[currentIterator]);
-            m_bonesLocalRotations.Add(boneRotations);
+            boneRotations.AddRange(_inputData[currentIterator]);
+            _bonesLocalRotations.Add(boneRotations);
             return;
         }
 
         else if (root.childCount > 0)
             foreach (Transform child in root.transform)
-                GetRotationDataForMatchingBoneInChildren(child, boneName, currentIterator);
+                GetBonesRotationData(child, boneName, currentIterator);
     }
 
     private void ReplayMotion(int dataIndex)
@@ -185,25 +180,25 @@ public class CSVDataLoader : CSVUtilities
         string tmpStr;
         Vector3 tmpV;
 
-        tmpStr = m_characterRootPositions[dataIndex];
+        tmpStr = _characterRootPositions[dataIndex];
         tmpV = StringToVector3(tmpStr);
-        character.transform.position = m_characterInitialPosition + tmpV;
+        _character.transform.position = _characterInitialPosition + tmpV;
 
-        tmpStr = m_characterRootRotations[dataIndex];
+        tmpStr = _characterRootRotations[dataIndex];
         tmpV = StringToVector3(tmpStr);
-        character.transform.rotation = Quaternion.Euler(tmpV);
+        _character.transform.rotation = Quaternion.Euler(tmpV);
 
-        tmpStr = m_rootBoneLocalPositions[dataIndex];
+        tmpStr = _rootBoneLocalPositions[dataIndex];
         tmpV = StringToVector3(tmpStr);
-        rootBone.transform.localPosition = tmpV;
+        _rootBone.transform.localPosition = tmpV;
 
-        for (int i = 0; i < m_bones.Count; i++)
+        for (int i = 0; i < _bones.Count; i++)
         {
-            if (m_bones[i].name == m_bonesLocalRotations[i][0])
+            if (_bones[i].name == _bonesLocalRotations[i][0])
             {
-                tmpStr = m_bonesLocalRotations[i][dataIndex];
+                tmpStr = _bonesLocalRotations[i][dataIndex];
                 tmpV = StringToVector3(tmpStr);
-                m_bones[i].localRotation = Quaternion.Euler(tmpV);
+                _bones[i].localRotation = Quaternion.Euler(tmpV);
             }
         }
     }

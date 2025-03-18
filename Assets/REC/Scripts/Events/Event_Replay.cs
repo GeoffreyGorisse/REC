@@ -1,22 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Event_Replay : Event_
 {
-    private bool m_eventConfigurated = false;
+    private bool _eventConfigurated = false;
 
     override protected void Update()
     {
         base.Update();
 
-        if (m_eventConfigurated)
+        if (_eventConfigurated)
             EventUpdate();
     }
 
     override protected void EventInitialisation()
     {
-        m_eventConfigurated = true;
+        _eventConfigurated = true;
     }
 
     override protected void EventReinitialisation()

@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
@@ -26,7 +25,7 @@ public class CSVUtilities : MonoBehaviour
 
         File.WriteAllText(filePath, sb.ToString());
 
-        Debug.Log("DATA saved");
+        Debug.Log("DATA saved.");
     }
 
     protected string[][] ReadCSV(string directoryPath, string fileName)
@@ -60,7 +59,7 @@ public class CSVUtilities : MonoBehaviour
         for (int i = 0; i < dataLines.Count; i++)
             CSVData[i] = dataLines[i].Split(';');
 
-        Debug.Log("DATA loaded");
+        Debug.Log("DATA loaded.");
 
         return CSVData;
     }
@@ -74,7 +73,6 @@ public class CSVUtilities : MonoBehaviour
 
         for (int i = 0; i < vectorValues.Length; i++)
             vectorValues[i] = vectorValues[i].Trim();
-
 
         Vector3 result = new Vector3(
             float.Parse(vectorValues[0], CultureInfo.InvariantCulture),

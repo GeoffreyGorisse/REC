@@ -1,13 +1,11 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 
 public class EventManager : MonoBehaviour
 {
     public static EventManager Instance { get; private set; }
     public int CurrentEventRef { get; private set; }
 
-    [SerializeField]
-    private Event_[] m_events;
+    [SerializeField] private Event_[] _events;
 
     void Awake ()
     {
@@ -25,11 +23,11 @@ public class EventManager : MonoBehaviour
     {
         CurrentEventRef = -1;
 
-        m_events = GetComponentsInChildren<Event_>(true);
+        _events = GetComponentsInChildren<Event_>(true);
 
-        if (m_events.Length > 0)
+        if (_events.Length > 0)
         {
-            foreach (Event_ event_ in m_events)
+            foreach (Event_ event_ in _events)
                 event_.gameObject.SetActive(false);
 
             NextEvent();
@@ -44,7 +42,7 @@ public class EventManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            m_events[CurrentEventRef].EventEnd();
+            _events[CurrentEventRef].EventEnd();
         }
     }
 
@@ -52,9 +50,9 @@ public class EventManager : MonoBehaviour
     {
         CurrentEventRef++;
 
-        if (CurrentEventRef == m_events.Length)
+        if (CurrentEventRef == _events.Length)
         {
-            m_events[CurrentEventRef - 1].gameObject.SetActive(false);
+            _events[CurrentEventRef - 1].gameObject.SetActive(false);
             
             Debug.Log("End");
             return;
@@ -62,10 +60,10 @@ public class EventManager : MonoBehaviour
 
         else
         {
-            for (int i = 0; i < m_events.Length; i++)
+            for (int i = 0; i < _events.Length; i++)
             {
                 bool eventActivation = i == CurrentEventRef ? true : false;
-                m_events[i].gameObject.SetActive(eventActivation);
+                _events[i].gameObject.SetActive(eventActivation);
             }
         }
     }
